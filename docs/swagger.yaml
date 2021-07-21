@@ -1,0 +1,14 @@
+basePath: /
+host: localhost:8001
+info:
+  contact: {}
+  description: API Server for goTeam manager
+  title: goTeam
+  version: "0.1"
+paths: {}
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
