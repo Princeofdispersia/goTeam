@@ -77,6 +77,6 @@ func NewService(repos *repository.Repository) *Service {
 		TeamRole:      NewTeamRoleService(repos.TeamRole, repos.Team),
 		Role:          NewRoleService(repos.Role, repos.Team, repos.TeamRole),
 		Task:          NewTaskService(repos.Task, repos.Team),
-		//Job: NewJobService(repos.Job, repos.Team),
+		Job:           NewJobService(repos.Job, repos.Team, repos.Task),
 	}
 }

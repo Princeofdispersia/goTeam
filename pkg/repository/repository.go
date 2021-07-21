@@ -45,7 +45,7 @@ type Task interface {
 
 type Job interface {
 	Create(userId int, job goTeam.Job) (int, error)
-	GetAll(jobId int) ([]goTeam.Job, error)
+	GetAll(teamId int) ([]goTeam.Job, error)
 	GetById(jobId int) (goTeam.Job, error)
 	Delete(jobId int) error
 	//Update(job goTeam.Job) error

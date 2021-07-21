@@ -1,34 +1,38 @@
 package service
 
 import (
+	"errors"
+	"github.com/Princeofdispersia/goTeam"
 	"github.com/Princeofdispersia/goTeam/pkg/repository"
 )
 
 type JobService struct {
-	teamRepo repository.Team
 	repo     repository.Job
+	teamRepo repository.Team
+	taskRepo repository.Task
 }
 
-func NewJobService(repo repository.Job, teamRepo repository.Team) *JobService {
-	return &JobService{repo: repo, teamRepo: teamRepo}
+func NewJobService(repo repository.Job, teamRepo repository.Team, taskRepo repository.Task) *JobService {
+	return &JobService{repo: repo, teamRepo: teamRepo, taskRepo: taskRepo}
 
 }
 
-/*
 func (s *JobService) Create(userId int, job goTeam.Job) (int, error) {
-	mod, err := s.teamRepo.IsModerator(userId, job.)
+	task, err := s.taskRepo.GetById(job.TaskId)
+	if err != nil {
+		return 0, err
+	}
+	mod, err := s.teamRepo.IsModerator(userId, task.TeamId)
 	if err != nil {
 		return 0, err
 	}
 	if !mod {
 		return 0, errors.New("access denied: you are not a moderator")
 	}
-	return s.repo.Create(userId, task)
+	return s.repo.Create(userId, job)
 }
 
-
-
-func (s *JobService) GetAll(userId int, teamId int) ([]goTeam.Task, error) {
+func (s *JobService) GetAll(userId int, teamId int) ([]goTeam.Job, error) {
 	memb, err := s.teamRepo.IsMember(userId, teamId)
 	if err != nil {
 		return nil, err
@@ -40,28 +44,41 @@ func (s *JobService) GetAll(userId int, teamId int) ([]goTeam.Task, error) {
 	return s.repo.GetAll(teamId)
 }
 
-func (s *JobService) GetById(userId int, taskId int) (goTeam.Task, error) {
-	task, err := s.repo.GetById(taskId)
+func (s *JobService) GetById(userId int, jobId int) (goTeam.Job, error) {
+	job, err := s.repo.GetById(jobId)
 	if err != nil {
-		return goTeam.Task{}, err
-	}
-	memb, err := s.teamRepo.IsMember(userId, task.TeamId)
-	if err != nil {
-		return goTeam.Task{}, err
-	}
-	if !memb {
-		return goTeam.Task{}, errors.New("access denied: you are not a member")
+		return goTeam.Job{}, err
 	}
 
-	return task, nil
+	task, err := s.taskRepo.GetById(job.TaskId)
+	if err != nil {
+		return goTeam.Job{}, err
+	}
+
+	memb, err := s.teamRepo.IsMember(userId, task.TeamId)
+	if err != nil {
+		return goTeam.Job{}, err
+	}
+
+	if !memb {
+		return goTeam.Job{}, errors.New("access denied: you are not a member")
+	}
+
+	return job, nil
 
 }
 
-func (s *JobService) Delete(userId int, taskId int) error{
-	task, err := s.repo.GetById(taskId)
+func (s *JobService) Delete(userId int, jobId int) error {
+	job, err := s.repo.GetById(jobId)
 	if err != nil {
 		return err
 	}
+
+	task, err := s.taskRepo.GetById(job.TaskId)
+	if err != nil {
+		return err
+	}
+
 	memb, err := s.teamRepo.IsModerator(userId, task.TeamId)
 	if err != nil {
 		return err
@@ -70,7 +87,7 @@ func (s *JobService) Delete(userId int, taskId int) error{
 		return errors.New("access denied: you are not a moderator")
 	}
 
-	return s.repo.Delete(taskId)
+	return s.repo.Delete(jobId)
 
 }
 

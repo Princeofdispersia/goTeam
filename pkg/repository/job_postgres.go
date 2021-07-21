@@ -14,31 +14,31 @@ func NewJobPostgres(db *sqlx.DB) *JobPostgres {
 	return &JobPostgres{db: db}
 }
 
-func (r *JobPostgres) Create(userId int, task goTeam.Task) (int, error) {
+func (r *JobPostgres) Create(userId int, job goTeam.Job) (int, error) {
 	var id int
-	createQuery := fmt.Sprintf("INSERT INTO %s (teamId, title, description, deadline) VALUES ($1, $2, $3, $4) RETURNING id",
-		taskTable)
-	err := r.db.Get(&id, createQuery, task.TeamId, task.Title, task.Description, task.Deadline)
+	createQuery := fmt.Sprintf("INSERT INTO %s (taskId, teamRoleId) VALUES ($1, $2) RETURNING id",
+		jobTable)
+	err := r.db.Get(&id, createQuery, job.TaskId, job.RoleId)
 	return id, err
 }
 
-func (r *JobPostgres) GetAll(teamId int) ([]goTeam.Task, error) {
-	var tasks []goTeam.Task
-	getAllQuery := fmt.Sprintf("SELECT * FROM %s WHERE teamId = $1", taskTable)
-	err := r.db.Select(&tasks, getAllQuery, teamId)
-	return tasks, err
+func (r *JobPostgres) GetAll(teamId int) ([]goTeam.Job, error) {
+	var jobs []goTeam.Job
+	getAllQuery := fmt.Sprintf("SELECT * FROM %s WHERE teamId = $1", jobTable)
+	err := r.db.Select(&jobs, getAllQuery, teamId)
+	return jobs, err
 }
 
-func (r *JobPostgres) GetById(taskId int) (goTeam.Task, error) {
-	var task goTeam.Task
-	getQuery := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", taskTable)
-	err := r.db.Get(&task, getQuery, taskId)
-	return task, err
+func (r *JobPostgres) GetById(taskId int) (goTeam.Job, error) {
+	var job goTeam.Job
+	getQuery := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", jobTable)
+	err := r.db.Get(&job, getQuery, taskId)
+	return job, err
 }
 
-func (r *JobPostgres) Delete(taskId int) error {
-	deleteQuery := fmt.Sprintf("DELETE FROM %s WHERE id = $1", taskTable)
-	_, err := r.db.Exec(deleteQuery, taskId)
+func (r *JobPostgres) Delete(jobId int) error {
+	deleteQuery := fmt.Sprintf("DELETE FROM %s WHERE id = $1", jobTable)
+	_, err := r.db.Exec(deleteQuery, jobId)
 
 	return err
 }
