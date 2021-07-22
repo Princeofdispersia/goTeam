@@ -22,7 +22,6 @@ import (
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/tasks [post]
-
 func (h *Handler) createTask(c *gin.Context) {
 	userId, ok := c.Get(idCtx)
 	if !ok {
@@ -53,19 +52,18 @@ func (h *Handler) createTask(c *gin.Context) {
 
 }
 
-// @Summary Get tasks
+// @Summary Get all tasks
 // @Security ApiKeyAuth
 // @Tags tasks
 // @Description get all tasks
 // @ID get-tasks
 // @Accept  json
 // @Produce  json
-// @Success 200 {integer} integer 1
+// @Success 200 {object} goTeam.Task
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/tasks [get]
-
 func (h *Handler) getAllTasks(c *gin.Context) {
 	userId, ok := c.Get(idCtx)
 	if !ok {
@@ -94,12 +92,12 @@ func (h *Handler) getAllTasks(c *gin.Context) {
 // @ID get-task-by-id
 // @Accept  json
 // @Produce  json
-// @Success 200 {integer} integer 1
+// @Param id path integer true "Task id"
+// @Success 200 {object} goTeam.Task
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/tasks/:id [get]
-
+// @Router /api/tasks/{id} [get]
 func (h *Handler) getTaskById(c *gin.Context) {
 	userId, ok := c.Get(idCtx)
 	if !ok {
@@ -119,6 +117,12 @@ func (h *Handler) getTaskById(c *gin.Context) {
 	c.JSON(http.StatusOK, task)
 }
 
+type updateTaskStruct struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Deadline    int    `json:"deadline"`
+}
+
 // @Summary Update tasks
 // @Security ApiKeyAuth
 // @Tags tasks
@@ -126,19 +130,14 @@ func (h *Handler) getTaskById(c *gin.Context) {
 // @ID update-tasks
 // @Accept  json
 // @Produce  json
+// @Param id path integer true "Task id"
 // @Param input body updateTaskStruct true "update task info"
-// @Success 200 {integer} integer 1
+// @Success 200 {object} goTeam.StatusOk
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/tasks/:id [put]
-
+// @Router /api/tasks/{id} [put]
 func (h *Handler) updateTask(c *gin.Context) {
-	type updateTaskStruct struct {
-		Title       string `json:"title"`
-		Description string `json:"description"`
-		Deadline    int    `json:"deadline"`
-	}
 	userId, ok := c.Get(idCtx)
 	if !ok {
 		newErrorResponse(c, http.StatusInternalServerError, "user id not found")
@@ -179,12 +178,12 @@ func (h *Handler) updateTask(c *gin.Context) {
 // @ID delete-task-by-id
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} map[string]string{"Status": "Ok"}
+// @Param id path integer true "Task id"
+// @Success 200 {object} goTeam.StatusOk
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/tasks/:id [delete]
-
+// @Router /api/tasks/{id} [delete]
 func (h *Handler) deleteTask(c *gin.Context) {
 	userId, ok := c.Get(idCtx)
 	if !ok {

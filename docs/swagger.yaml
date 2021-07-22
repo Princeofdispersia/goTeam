@@ -1,11 +1,582 @@
 basePath: /
+definitions:
+  goTeam.GetTeamResponse:
+    properties:
+      teamId:
+        type: integer
+      teamRoles:
+        items:
+          $ref: '#/definitions/goTeam.GetTeamResponseRole'
+        type: array
+      title:
+        type: string
+    type: object
+  goTeam.GetTeamResponseRole:
+    properties:
+      moderator:
+        type: boolean
+      roleId:
+        type: integer
+      roleTitle:
+        type: string
+    type: object
+  goTeam.StatusOk:
+    properties:
+      status:
+        example: OK
+        type: string
+    type: object
+  goTeam.Task:
+    properties:
+      deadline:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      isActual:
+        type: boolean
+      teamId:
+        type: integer
+      title:
+        type: string
+    required:
+      - teamId
+      - title
+    type: object
+  goTeam.Team:
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+    required:
+      - title
+    type: object
+  goTeam.signInReq:
+    properties:
+      name:
+        example: Mark
+        type: string
+      sig:
+        example: 3835c2448a04d7bd74b6a99c3a6dc1147
+        type: string
+    type: object
+  goTeam.signInResp:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+    type: object
+  goTeam.signUpReq:
+    properties:
+      name:
+        example: Mark
+        type: string
+    type: object
+  goTeam.signUpResp:
+    properties:
+      id:
+        example: 1
+        type: integer
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+    type: object
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.updateTaskStruct:
+    properties:
+      deadline:
+        type: integer
+      description:
+        type: string
+      title:
+        type: string
+    type: object
 host: localhost:8001
 info:
   contact: {}
   description: API Server for goTeam manager
   title: goTeam
   version: "0.1"
-paths: {}
+paths:
+  /auth/sign-in:
+    post:
+      consumes:
+        - application/json
+      description: Get token for existing account
+      operationId: login
+      parameters:
+        - description: Name and signature
+          in: body
+          name: input
+          required: true
+          schema:
+            $ref: '#/definitions/goTeam.signInReq'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/goTeam.signInResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: SignIn
+      tags:
+        - auth
+  /auth/sign-up:
+    post:
+      consumes:
+        - application/json
+      description: Create account
+      operationId: create-account
+      parameters:
+        - description: Name
+          in: body
+          name: input
+          required: true
+          schema:
+            $ref: '#/definitions/goTeam.signUpReq'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/goTeam.signUpResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: SignUp
+      tags:
+        - auth
+  /api/tasks:
+    get:
+      consumes:
+        - application/json
+      description: get all tasks
+      operationId: get-tasks
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/goTeam.Task'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+        - ApiKeyAuth: []
+      summary: Get all tasks
+      tags:
+        - tasks
+    post:
+      consumes:
+        - application/json
+      description: create new task
+      operationId: create-task
+      parameters:
+        - description: task info
+          in: body
+          name: input
+          required: true
+          schema:
+            $ref: '#/definitions/goTeam.Task'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+        - ApiKeyAuth: []
+      summary: Create task
+      tags:
+        - tasks
+  /api/tasks/{id}:
+    delete:
+      consumes:
+        - application/json
+      description: delete task by id
+      operationId: delete-task-by-id
+      parameters:
+        - description: Task id
+          in: path
+          name: id
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/goTeam.StatusOk'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+        - ApiKeyAuth: []
+      summary: Delete task
+      tags:
+        - tasks
+    get:
+      consumes:
+        - application/json
+      description: get task by id
+      operationId: get-task-by-id
+      parameters:
+        - description: Task id
+          in: path
+          name: id
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/goTeam.Task'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+        - ApiKeyAuth: []
+      summary: Get task
+      tags:
+        - tasks
+    put:
+      consumes:
+        - application/json
+      description: update task information
+      operationId: update-tasks
+      parameters:
+        - description: Task id
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: update task info
+          in: body
+          name: input
+          required: true
+          schema:
+            $ref: '#/definitions/handler.updateTaskStruct'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/goTeam.StatusOk'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+        - ApiKeyAuth: []
+      summary: Update tasks
+      tags:
+        - tasks
+  /api/team/{id}:
+    delete:
+      consumes:
+        - application/json
+      description: delete team by id
+      operationId: delete-team-by-id
+      parameters:
+        - description: Team id
+          in: path
+          name: id
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/goTeam.StatusOk'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+        - ApiKeyAuth: []
+      summary: Delete team
+      tags:
+        - teams
+    get:
+      consumes:
+        - application/json
+      description: get team by id
+      operationId: get-team-by-id
+      parameters:
+        - description: Team id
+          in: path
+          name: id
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/goTeam.GetTeamResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+        - ApiKeyAuth: []
+      summary: Get team
+      tags:
+        - teams
+  /api/teams:
+    get:
+      consumes:
+        - application/json
+      description: get all teams
+      operationId: get-teams
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/goTeam.Team'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+        - ApiKeyAuth: []
+      summary: Get teams
+      tags:
+        - teams
+    post:
+      consumes:
+        - application/json
+      description: create new team
+      operationId: create-team
+      parameters:
+        - description: team info
+          in: body
+          name: input
+          required: true
+          schema:
+            $ref: '#/definitions/goTeam.Team'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+        - ApiKeyAuth: []
+      summary: Create team
+      tags:
+        - teams
+  /api/teams/{id}:
+    put:
+      consumes:
+        - application/json
+      description: update team info
+      operationId: update-team
+      parameters:
+        - description: Team id
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: update team info
+          in: body
+          name: input
+          required: true
+          schema:
+            $ref: '#/definitions/goTeam.Team'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/goTeam.StatusOk'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+        - ApiKeyAuth: []
+      summary: Update team
+      tags:
+        - teams
 securityDefinitions:
   ApiKeyAuth:
     in: header

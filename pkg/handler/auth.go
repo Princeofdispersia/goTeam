@@ -8,17 +8,16 @@ import (
 
 // @Summary SignUp
 // @Tags auth
-// @Description create account
+// @Description Create account
 // @ID create-account
 // @Accept  json
 // @Produce  json
-// @Param input body name true "User name"
-// @Success 200 {integer} integer 1
+// @Param input body goTeam.signUpReq true "Name"
+// @Success 200 {object} goTeam.signUpResp
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /auth/sign-up [post]
-
 func (h *Handler) signUp(c *gin.Context) {
 	var input goTeam.User
 
@@ -41,17 +40,14 @@ func (h *Handler) signUp(c *gin.Context) {
 
 // @Summary SignIn
 // @Tags auth
-// @Description get token for existing account
+// @Description Get token for existing account
 // @ID login
 // @Accept  json
 // @Produce  json
-// @Param input body sig true "Signature"
-// @Success 200 {integer} integer 1
-// @Failure 400,404 {object} errorResponse
-// @Failure 500 {object} errorResponse
-// @Failure default {object} errorResponse
+// @Param input body goTeam.signInReq true "Name and signature"
+// @Success 200 {object} goTeam.signInResp
+// @Failure 400,404,500 {object} errorResponse
 // @Router /auth/sign-in [post]
-
 func (h *Handler) signIn(c *gin.Context) {
 	var input goTeam.User
 
@@ -72,7 +68,6 @@ func (h *Handler) signIn(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"id":    input.Id,
 		"token": token,
 	})
 }

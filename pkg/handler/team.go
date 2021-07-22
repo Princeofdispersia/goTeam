@@ -20,7 +20,6 @@ import (
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/teams [post]
-
 func (h *Handler) createTeam(c *gin.Context) {
 	id, ok := c.Get(idCtx)
 	if !ok {
@@ -58,7 +57,6 @@ func (h *Handler) createTeam(c *gin.Context) {
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/teams [get]
-
 func (h *Handler) getAllTeams(c *gin.Context) {
 	id, ok := c.Get(idCtx)
 	if !ok {
@@ -80,12 +78,12 @@ func (h *Handler) getAllTeams(c *gin.Context) {
 // @ID get-team-by-id
 // @Accept  json
 // @Produce  json
+// @Param id path integer true "Team id"
 // @Success 200 {object} goTeam.GetTeamResponse
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/team/:id [get]
-
+// @Router /api/team/{id} [get]
 func (h *Handler) getTeamById(c *gin.Context) {
 	id, ok := c.Get(idCtx)
 	if !ok {
@@ -109,18 +107,18 @@ func (h *Handler) getTeamById(c *gin.Context) {
 
 // @Summary Update team
 // @Security ApiKeyAuth
-// @Tags team
+// @Tags teams
 // @Description update team info
 // @ID update-team
 // @Accept  json
 // @Produce  json
+// @Param id path integer true "Team id"
 // @Param input body goTeam.Team true "update team info"
-// @Success 200 {object} map[string]string{"Status": "Ok"}
+// @Success 200 {object} goTeam.StatusOk
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/teams/:id [put]
-
+// @Router /api/teams/{id} [put]
 func (h *Handler) updateTeam(c *gin.Context) {
 	id, ok := c.Get(idCtx)
 	if !ok {
@@ -157,17 +155,17 @@ func (h *Handler) updateTeam(c *gin.Context) {
 
 // @Summary Delete team
 // @Security ApiKeyAuth
-// @Tags team
+// @Tags teams
 // @Description delete team by id
 // @ID delete-team-by-id
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} map[string]string{"Status": "Ok"}
+// @Param id path integer true "Team id"
+// @Success 200 {object} goTeam.StatusOk
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/team/:id [delete]
-
+// @Router /api/team/{id} [delete]
 func (h *Handler) deleteTeam(c *gin.Context) {
 	id, ok := c.Get(idCtx)
 	if !ok {
